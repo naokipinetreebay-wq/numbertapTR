@@ -7,7 +7,9 @@ import {
   type ControllerRoleMode,
 } from "@/components/ControllerRoleChoice";
 import { SessionExit } from "@/components/SessionExit";
-import type { ClientMessage, RoomConfig, RoomSnapshot } from "@/lib/types";
+import { TimingFields } from "@/components/TimingFields";
+import type { ClientMessage, RoomSnapshot } from "@/lib/types";
+import { timingLabel } from "@/lib/types";
 
 const STEPS = ["説明", "役割", "端末", "表示", "確認"] as const;
 
@@ -32,10 +34,6 @@ export function SetupWizard({
     if (typeof window === "undefined") return "";
     return `${window.location.origin}/d/${snapshot.code}`;
   }, [snapshot.code]);
-
-  const patch = (partial: Partial<RoomConfig>) => {
-    send({ type: "updateConfig", config: partial });
-  };
 
   const joined = snapshot.displays.length;
   const canLeaveRole = roleMode !== null;
@@ -78,6 +76,7 @@ export function SetupWizard({
                 押す順番は <strong>1→2→3→4→5→6→7→8→9→0</strong>。0は10です。
               </li>
               <li>押すべき数字は、どれか1台だけに出ます。ほかはそれ以外の数字です。</li>
+              <li>画面の上に、押したところと次に押す数字が出ます。大きい数字がそれと同じ端末を押します。</li>
               <li>間違えても最初には戻りません。正しい数字を押すと次へ進みます。</li>
               <li>1が出てから0を押すまでの時間を計ります。</li>
             </ul>
@@ -122,23 +121,10 @@ export function SetupWizard({
         {step === 3 ? (
           <div className="wizard-body">
             <h2>表示</h2>
-            <label className="field">
-              <span>
-                表示秒数:{" "}
-                {cfg.displaySeconds === 0 ? "正解まで固定" : `${cfg.displaySeconds}秒`}
-              </span>
-              <input
-                type="range"
-                min={0}
-                max={8}
-                step={0.5}
-                value={cfg.displaySeconds}
-                onChange={(e) => patch({ displaySeconds: Number(e.target.value) })}
-              />
-            </label>
-            <p className="muted">
-              秒数を入れると、正解する前に盤面がランダムに切り替わります。0秒は、正解するまで数字が動きません。
-            </p>
+            <TimingFields
+              config={cfg}
+              onChange={(partial) => send({ type: "updateConfig", config: partial })}
+            />
           </div>
         ) : null}
 
@@ -150,10 +136,7 @@ export function SetupWizard({
                 役割: {roleMode === "alsoDisplay" ? "この端末もタップ対象" : "操作専用"}
               </li>
               <li>端末 {joined} 台</li>
-              <li>
-                表示:{" "}
-                {cfg.displaySeconds === 0 ? "正解まで固定" : `${cfg.displaySeconds}秒ごとに入替`}
-              </li>
+              <li>表示: {timingLabel(cfg)}</li>
             </ul>
             <p className="muted">「はじめる」で1が表示され、計測が始まります。</p>
           </div>

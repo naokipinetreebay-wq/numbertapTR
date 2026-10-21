@@ -4,9 +4,14 @@ export type Role = "controller" | "display";
 export const SEQUENCE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0] as const;
 export type TapDigit = (typeof SEQUENCE)[number];
 
+export type DisplayTiming = "fixed" | "random";
+
 export interface RoomConfig {
-  /** 0 = 正解するまで盤面を固定。それ以外は秒ごとにランダム再配置 */
-  displaySeconds: number;
+  timingMode: DisplayTiming;
+  /** 0 = 正解するまで盤面を固定 */
+  fixedSeconds: number;
+  randomMinSeconds: number;
+  randomMaxSeconds: number;
   running: boolean;
 }
 
@@ -48,6 +53,19 @@ export type ServerMessage =
   | { type: "pong" };
 
 export const DEFAULT_CONFIG: RoomConfig = {
-  displaySeconds: 3,
+  timingMode: "fixed",
+  fixedSeconds: 3,
+  randomMinSeconds: 1,
+  randomMaxSeconds: 4,
   running: false,
 };
+
+export function timingLabel(config: RoomConfig): string {
+  if (config.timingMode === "random") {
+    const min = Math.min(config.randomMinSeconds, config.randomMaxSeconds);
+    const max = Math.max(config.randomMinSeconds, config.randomMaxSeconds);
+    return `${min}〜${max}秒のランダム`;
+  }
+  if (config.fixedSeconds <= 0) return "正解まで固定";
+  return `${config.fixedSeconds}秒ごと`;
+}

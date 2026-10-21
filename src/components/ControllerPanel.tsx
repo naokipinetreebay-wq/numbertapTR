@@ -3,7 +3,8 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useState } from "react";
 import { SessionExit } from "@/components/SessionExit";
-import type { ClientMessage, RoomConfig, RoomSnapshot } from "@/lib/types";
+import { TimingFields } from "@/components/TimingFields";
+import type { ClientMessage, RoomSnapshot } from "@/lib/types";
 import { SEQUENCE } from "@/lib/types";
 
 function formatSeconds(ms: number): string {
@@ -38,10 +39,6 @@ export function ControllerPanel({
     cfg.running && snapshot.startedAt != null
       ? Math.max(0, Date.now() + skew - snapshot.startedAt)
       : snapshot.lastElapsedMs;
-
-  const patch = (partial: Partial<RoomConfig>) => {
-    send({ type: "updateConfig", config: partial });
-  };
 
   return (
     <div className="controller">
@@ -105,20 +102,10 @@ export function ControllerPanel({
               一時停止
             </button>
           </div>
-          <label className="field">
-            <span>
-              表示秒数: {cfg.displaySeconds === 0 ? "正解まで固定" : `${cfg.displaySeconds}秒`}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={8}
-              step={0.5}
-              value={cfg.displaySeconds}
-              onChange={(e) => patch({ displaySeconds: Number(e.target.value) })}
-            />
-          </label>
-          <p className="muted">0秒にすると、正解を押すまで数字は動きません。</p>
+          <TimingFields
+            config={cfg}
+            onChange={(partial) => send({ type: "updateConfig", config: partial })}
+          />
         </div>
       </section>
 

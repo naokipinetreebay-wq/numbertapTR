@@ -690,12 +690,14 @@ select {
   height: 100%;
   border: 0;
   margin: 0;
-  padding: 0;
+  padding: 3vh 16px 2.5vh;
   background: #07131f;
   color: #fff;
   cursor: pointer;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -704,11 +706,71 @@ select {
   background: #123a28;
 }
 
+.tap-cue {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.tap-cue-status {
+  font-size: clamp(0.95rem, 3.4vw, 1.2rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.88;
+}
+
+.tap-cue-label {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.tap-cue-num {
+  font-family: var(--font-display);
+  font-size: 16vmin;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+}
+
 .tap-digit {
   font-family: var(--font-display);
-  font-size: 62vmin;
+  font-size: min(46vmin, 40vh);
   line-height: 0.85;
   letter-spacing: -0.06em;
+}
+
+.tap-seq {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.tap-seq li {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tap-seq li.done {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.tap-seq li.now {
+  background: #fff;
+  border-color: #fff;
+  color: var(--ink);
 }
 
 .tap-done {

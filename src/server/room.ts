@@ -24,6 +24,16 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
+function nextWaitMs(config: RoomConfig): number {
+  if (config.timingMode === "random") {
+    const min = Math.min(config.randomMinSeconds, config.randomMaxSeconds);
+    const max = Math.max(config.randomMinSeconds, config.randomMaxSeconds);
+    return (min + Math.random() * (max - min)) * 1000;
+  }
+  if (config.fixedSeconds <= 0) return 0;
+  return config.fixedSeconds * 1000;
+}
+
 export type ClientSocket = WebSocket & {
   role?: "controller" | "display";
   deviceId?: string;
@@ -120,8 +130,12 @@ export class Room {
   }
 
   updateConfig(partial: Partial<RoomConfig>) {
-    this.config = { ...this.config, ...partial, running: this.config.running };
-    this.config.displaySeconds = clamp(this.config.displaySeconds, 0, 15);
+    const next = { ...this.config, ...partial, running: this.config.running };
+    next.timingMode = next.timingMode === "random" ? "random" : "fixed";
+    next.fixedSeconds = clamp(next.fixedSeconds, 0, 8);
+    next.randomMinSeconds = clamp(next.randomMinSeconds, 0.5, 8);
+    next.randomMaxSeconds = clamp(next.randomMaxSeconds, 0.5, 8);
+    this.config = next;
     this.touch();
     if (this.config.running) this.arm();
     this.broadcast();
@@ -182,8 +196,9 @@ export class Room {
 
   private arm() {
     this.clearTimer();
-    if (!this.config.running || this.config.displaySeconds <= 0) return;
-    const wait = this.config.displaySeconds * 1000;
+    if (!this.config.running) return;
+    const wait = nextWaitMs(this.config);
+    if (wait <= 0) return;
     this.timer = setTimeout(() => {
       if (!this.config.running || this.step >= SEQUENCE.length) return;
       this.deal();

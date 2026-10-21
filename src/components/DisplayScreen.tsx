@@ -50,11 +50,9 @@ export function DisplayScreen({
 
   const seconds =
     snapshot.lastElapsedMs != null ? (snapshot.lastElapsedMs / 1000).toFixed(2) : null;
-  const next = snapshot.target;
-  const pressed =
-    snapshot.step <= 0 ? "まだ押していません" : `${SEQUENCE[snapshot.step - 1]}まで押した`;
   const waiting = !snapshot.config.running && snapshot.startedAt == null && !done;
   const paused = !snapshot.config.running && !done && !waiting;
+  const cue = done ? "完了" : waiting ? "開始待ち" : paused ? "一時停止" : "";
 
   return (
     <button
@@ -62,19 +60,7 @@ export function DisplayScreen({
       className={`tap-root${flash ? " flash" : ""}`}
       onPointerDown={onTap}
     >
-      <span className="tap-cue">
-        {done ? (
-          <span className="tap-cue-status">完了</span>
-        ) : (
-          <>
-            <span className="tap-cue-status">
-              {waiting ? "開始待ち" : paused ? `一時停止 · ${pressed}` : pressed}
-            </span>
-            <span className="tap-cue-label">次に押す</span>
-            <span className="tap-cue-num">{next ?? SEQUENCE[0]}</span>
-          </>
-        )}
-      </span>
+      <span className="tap-cue">{cue}</span>
       {done ? (
         <span className="tap-done">
           <span className="tap-digit">{seconds ?? "0"}</span>

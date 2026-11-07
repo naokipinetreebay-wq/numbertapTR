@@ -773,3 +773,12 @@ select {
   inset: 0 0 56px 0;
   height: auto;
 }
+
+.ad-video {
+  display: block;
+  width: 100%;
+  max-height: 52vh;
+  margin: 8px 0 18px;
+  border-radius: 10px;
+  background: #0a0a0a;
+}

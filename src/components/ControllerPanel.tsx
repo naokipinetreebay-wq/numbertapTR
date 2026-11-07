@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SessionExit } from "@/components/SessionExit";
 import { TimingFields } from "@/components/TimingFields";
 import type { ClientMessage, RoomSnapshot } from "@/lib/types";
+import { displayJoinUrl } from "@/lib/roomCode";
 import { SEQUENCE } from "@/lib/types";
 
 function formatSeconds(ms: number): string {
@@ -25,7 +26,7 @@ export function ControllerPanel({
   const cfg = snapshot.config;
   const displayUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/d/?code=${snapshot.code}`;
+    return displayJoinUrl(snapshot.code);
   }, [snapshot.code]);
 
   const [, setTick] = useState(0);

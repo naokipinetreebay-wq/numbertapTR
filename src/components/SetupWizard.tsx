@@ -9,6 +9,7 @@ import {
 import { SessionExit } from "@/components/SessionExit";
 import { TimingFields } from "@/components/TimingFields";
 import type { ClientMessage, RoomSnapshot } from "@/lib/types";
+import { displayJoinUrl } from "@/lib/roomCode";
 import { timingLabel } from "@/lib/types";
 
 const STEPS = ["説明", "役割", "端末", "表示", "確認"] as const;
@@ -32,7 +33,7 @@ export function SetupWizard({
   const cfg = snapshot.config;
   const displayUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/d/?code=${snapshot.code}`;
+    return displayJoinUrl(snapshot.code);
   }, [snapshot.code]);
 
   const joined = snapshot.displays.length;

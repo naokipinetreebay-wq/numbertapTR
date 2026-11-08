@@ -1,5 +1,7 @@
 "use client";
 
+import { NumberSelect } from "@/components/NumberSelect";
+
 import type { RoomConfig } from "@/lib/types";
 
 export function TimingFields({
@@ -27,24 +29,22 @@ export function TimingFields({
         <div className="row">
           <label className="field">
             <span>下限 {config.randomMinSeconds}秒</span>
-            <input
-              type="range"
+            <NumberSelect
               min={0.5}
               max={8}
               step={0.5}
               value={config.randomMinSeconds}
-              onChange={(e) => onChange({ randomMinSeconds: Number(e.target.value) })}
+              onChange={(n) => onChange({ randomMinSeconds: n })}
             />
           </label>
           <label className="field">
             <span>上限 {config.randomMaxSeconds}秒</span>
-            <input
-              type="range"
+            <NumberSelect
               min={0.5}
               max={8}
               step={0.5}
               value={config.randomMaxSeconds}
-              onChange={(e) => onChange({ randomMaxSeconds: Number(e.target.value) })}
+              onChange={(n) => onChange({ randomMaxSeconds: n })}
             />
           </label>
         </div>
@@ -53,13 +53,12 @@ export function TimingFields({
           <span>
             秒数: {config.fixedSeconds === 0 ? "正解まで固定" : `${config.fixedSeconds}秒`}
           </span>
-          <input
-            type="range"
+          <NumberSelect
             min={0}
             max={8}
             step={0.5}
             value={config.fixedSeconds}
-            onChange={(e) => onChange({ fixedSeconds: Number(e.target.value) })}
+            onChange={(n) => onChange({ fixedSeconds: n })}
           />
         </label>
       )}

@@ -57,6 +57,12 @@ export type ClientMessage =
   | { type: "stop" }
   | { type: "hostPush"; overlay: HostPushOverlay }
   | { type: "tap"; deviceId: string }
+  | {
+      type: "signal";
+      from: string;
+      to: string;
+      payload: unknown;
+    }
   | { type: "ping" };
 
 export type ClientEventMessage = {
@@ -69,6 +75,12 @@ export type ServerMessage =
   | { type: "snapshot"; snapshot: RoomSnapshot }
   | { type: "error"; message: string }
   | { type: "pong" }
+  | {
+      type: "signal";
+      from: string;
+      to: string;
+      payload: unknown;
+    }
   | ClientEventMessage;
 
 export const DEFAULT_CONFIG: RoomConfig = {

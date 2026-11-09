@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ClientMessage, RoomSnapshot } from "@/lib/types";
+import type { RoomSnapshot } from "@/lib/types";
 import { SEQUENCE } from "@/lib/types";
 
 export function DisplayScreen({
   snapshot,
   deviceId,
-  send,
+  sendGame,
 }: {
   snapshot: RoomSnapshot;
   deviceId: string;
-  send: (msg: ClientMessage) => void;
+  /** DataChannel 優先、なければ WS tap */
+  sendGame: (msg: unknown) => boolean;
 }) {
   const digit = snapshot.digits[deviceId];
   const done = snapshot.step >= SEQUENCE.length;
@@ -45,7 +46,7 @@ export function DisplayScreen({
     lock.current = now;
     setFlash(true);
     window.setTimeout(() => setFlash(false), 140);
-    send({ type: "tap", deviceId });
+    sendGame({ type: "clientEvent", event: "tap", deviceId });
   };
 
   const seconds =

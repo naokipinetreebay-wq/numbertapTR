@@ -5,6 +5,7 @@ import { ControllerPanel } from "@/components/ControllerPanel";
 import type { ControllerRoleMode } from "@/components/ControllerRoleChoice";
 import { DisplayScreen } from "@/components/DisplayScreen";
 import { SetupWizard } from "@/components/SetupWizard";
+import { useNumberTapLocalHost, type NumberClientEvent } from "@/lib/localHost";
 import { useRoomCode } from "@/lib/roomCode";
 import { useDeviceId, useRoomSocket } from "@/lib/ws";
 
@@ -12,7 +13,15 @@ export default function ControllerPage() {
   const code = useRoomCode();
   const deviceId = useDeviceId(`controller-${code}`);
   const displayId = useDeviceId(`controller-as-display-${code}`);
-  const { snapshot, error, connected, send } = useRoomSocket(code, "controller", deviceId);
+  const onClientEventRef = useRef<(ev: NumberClientEvent) => void>(() => undefined);
+  const { snapshot, error, connected, send } = useRoomSocket(
+    code,
+    "controller",
+    deviceId,
+    (ev) => onClientEventRef.current(ev)
+  );
+  const { startLocal, stopLocal, onClientEvent } = useNumberTapLocalHost(snapshot, send);
+  onClientEventRef.current = onClientEvent;
 
   const wizardKey = `nt-wizard-done-${code}`;
   const roleKey = `nt-ctrl-role-${code}`;
@@ -45,8 +54,8 @@ export default function ControllerPage() {
     if (!pendingStart.current || !ready || !snapshot) return;
     if (alsoDisplay && !snapshot.displays.some((d) => d.id === displayId)) return;
     pendingStart.current = false;
-    send({ type: "start" });
-  }, [alsoDisplay, displayId, ready, send, snapshot]);
+    startLocal();
+  }, [alsoDisplay, displayId, ready, snapshot, startLocal]);
 
   if (error && !snapshot) {
     return (
@@ -111,6 +120,11 @@ export default function ControllerPage() {
         connected={connected}
         send={send}
         clearSessionKeys={[wizardKey, roleKey]}
+        onStart={() => {
+          startLocal();
+          if (alsoDisplay) setView("display");
+        }}
+        onStop={stopLocal}
       />
       <div className="controller" style={{ paddingTop: 0, gap: 10 }}>
         {alsoDisplay ? (

@@ -38,19 +38,38 @@ export interface RoomSnapshot {
   serverNow: number;
 }
 
+export type HostPushOverlay = {
+  step?: number;
+  digits?: Record<string, number>;
+  targetId?: string | null;
+  boardId?: number;
+  startedAt?: number | null;
+  finishedAt?: number | null;
+  lastElapsedMs?: number | null;
+  hostNow?: number;
+};
+
 export type ClientMessage =
   | { type: "hello"; role: Role; deviceId: string; label?: string }
   | { type: "updateConfig"; config: Partial<RoomConfig> }
   | { type: "setLabel"; deviceId: string; label: string }
-  | { type: "start" }
+  | { type: "start"; local?: boolean }
   | { type: "stop" }
+  | { type: "hostPush"; overlay: HostPushOverlay }
   | { type: "tap"; deviceId: string }
   | { type: "ping" };
+
+export type ClientEventMessage = {
+  type: "clientEvent";
+  event: "tap";
+  deviceId: string;
+};
 
 export type ServerMessage =
   | { type: "snapshot"; snapshot: RoomSnapshot }
   | { type: "error"; message: string }
-  | { type: "pong" };
+  | { type: "pong" }
+  | ClientEventMessage;
 
 export const DEFAULT_CONFIG: RoomConfig = {
   timingMode: "fixed",
